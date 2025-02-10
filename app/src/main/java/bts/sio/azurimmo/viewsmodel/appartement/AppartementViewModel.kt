@@ -5,26 +5,50 @@ import androidx.lifecycle.ViewModel
 import bts.sio.azurimmo.model.Batiment
 import androidx.compose.runtime.*
 import androidx.lifecycle.viewModelScope
+import bts.sio.azurimmo.api.RetrofitInstance
 import bts.sio.azurimmo.model.Appartement
 import kotlinx.coroutines.launch
 
 // ViewModel pour gérer les données des bâtiments
 class AppartementViewModel : ViewModel() {
-    // Liste mutable des bâtiments
-    private val _appartements = mutableStateOf(emptyList<Appartement>())
+    // Liste mutable des appartements
+    private val _appartements = mutableStateOf<List<Appartement>>(emptyList())
     val appartements: State<List<Appartement>> = _appartements
+    private val _isLoading = mutableStateOf(false)
+    val isLoading: State<Boolean> = _isLoading
+    private val _errorMessage = mutableStateOf<String?>(null)
+    val errorMessage: State<String?> = _errorMessage
     init {
 // Simuler un chargement de données initiales
         getAppartements()
     }
-    // Fonction pour simuler le chargement de bâtiments
     private fun getAppartements() {
         viewModelScope.launch {
-            _appartements.value = listOf(
-                Appartement(1, 101, 80.0, 2, "Appartement moderne", Batiment(1, "123 Rue Principale", "Nice")),
-                Appartement(2, 202, 120.0, 3, "Appartement spacieux", Batiment(2, "456 Avenue des Champs", "Marseille")),
-                Appartement(3, 303, 90.0, 2, "Appartement moderne", Batiment(3, "789 Boulevard Haussmann", "Marseille"))
-            )
+            _isLoading.value = true
+            try {
+                val response = RetrofitInstance.api.getAppartements()
+                _appartements.value = response
+            } catch (e: Exception) {
+                _errorMessage.value = "Erreur : ${e.message}"
+            } finally {
+                _isLoading.value = false
+                println("pas de chargement")
+            }
         }
     }
+
+    fun getAppartementsByBatimentId(batimentId: Int) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                val response = RetrofitInstance.api.getAppartementsByBatimentId(batimentId)
+                _appartements.value = response
+            } catch (e: Exception) {
+                _errorMessage.value = "Erreur : ${e.message}"
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
 }

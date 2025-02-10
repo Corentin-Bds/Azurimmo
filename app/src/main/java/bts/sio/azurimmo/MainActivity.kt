@@ -9,13 +9,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import bts.sio.azurimmo.ui.theme.Azurimmo2Theme
 import bts.sio.azurimmo.views.appartement.AppartementList
+import bts.sio.azurimmo.views.batiment.BatimentList
+import bts.sio.azurimmo.views.contrat.ContratList
+import bts.sio.azurimmo.views.intervention.InterventionList
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            // Appel de la fonction BatimentList
-            AppartementList()
+            MainScreen()
+            //AppartementList()
+            //BatimentList()
+            //ContratList()
+            //InterventionList()
         }
     }
 }
