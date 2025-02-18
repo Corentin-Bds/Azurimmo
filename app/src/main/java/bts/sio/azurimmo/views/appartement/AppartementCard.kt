@@ -57,6 +57,16 @@ fun AppartementCard(appartement: Appartement) { // Notez l'annotation @Composabl
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
+            Row {
+                Text(
+                    text = "Nombre de pièces : ",  // ✅ Ajout de la ligne pour le nombre de pièces
+                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+                )
+                Text(
+                    text = appartement.nbrPiece.toString(),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
         }
     }
 }
