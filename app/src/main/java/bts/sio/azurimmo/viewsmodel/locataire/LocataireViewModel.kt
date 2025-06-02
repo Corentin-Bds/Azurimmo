@@ -1,16 +1,16 @@
-package bts.sio.azurimmo.viewsmodel.contrat
+package bts.sio.azurimmo.viewsmodel.locataire
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import bts.sio.azurimmo.api.RetrofitInstance
-import bts.sio.azurimmo.model.Contrat
+import bts.sio.azurimmo.model.Locataire
 import kotlinx.coroutines.launch
 
-class ContratViewModel : ViewModel() {
-    private val _contrats = mutableStateOf<List<Contrat>>(emptyList())
-    val contrats: State<List<Contrat>> = _contrats
+class LocataireViewModel : ViewModel() {
+    private val _locataires = mutableStateOf<List<Locataire>>(emptyList())
+    val locataires: State<List<Locataire>> = _locataires
 
     private val _isLoading = mutableStateOf(false)
     val isLoading: State<Boolean> = _isLoading
@@ -18,17 +18,13 @@ class ContratViewModel : ViewModel() {
     private val _errorMessage = mutableStateOf<String?>(null)
     val errorMessage: State<String?> = _errorMessage
 
-    init {
-        getContrats()
-    }
-
-    fun getContrats() {
+    fun getLocataires() {
         viewModelScope.launch {
             _isLoading.value = true
             _errorMessage.value = null
             try {
-                val response = RetrofitInstance.api.getContrats()
-                _contrats.value = response
+                val response = RetrofitInstance.api.getLocataires()
+                _locataires.value = response
             } catch (e: Exception) {
                 _errorMessage.value = "Erreur : ${e.message}"
             } finally {
@@ -37,13 +33,13 @@ class ContratViewModel : ViewModel() {
         }
     }
 
-    fun addContrat(contrat: Contrat) {
+    fun addLocataire(locataire: Locataire) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val response = RetrofitInstance.api.createContrat(contrat)
+                val response = RetrofitInstance.api.createLocataire(locataire)
                 if (response.isSuccessful) {
-                    getContrats() // Recharger la liste
+                    getLocataires() // Recharger la liste
                 } else {
                     _errorMessage.value = "Erreur lors de l'ajout : ${response.message()}"
                 }
@@ -55,13 +51,13 @@ class ContratViewModel : ViewModel() {
         }
     }
 
-    fun updateContrat(id: Int, contrat: Contrat) {
+    fun updateLocataire(id: Int, locataire: Locataire) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val response = RetrofitInstance.api.updateContrat(id, contrat)
+                val response = RetrofitInstance.api.updateLocataire(id, locataire)
                 if (response.isSuccessful) {
-                    getContrats() // Recharger la liste
+                    getLocataires() // Recharger la liste
                 } else {
                     _errorMessage.value = "Erreur lors de la modification : ${response.message()}"
                 }
@@ -73,13 +69,13 @@ class ContratViewModel : ViewModel() {
         }
     }
 
-    fun deleteContrat(id: Int) {
+    fun deleteLocataire(id: Int) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val response = RetrofitInstance.api.deleteContrat(id)
+                val response = RetrofitInstance.api.deleteLocataire(id)
                 if (response.isSuccessful) {
-                    getContrats() // Recharger la liste
+                    getLocataires() // Recharger la liste
                 } else {
                     _errorMessage.value = "Erreur lors de la suppression : ${response.message()}"
                 }

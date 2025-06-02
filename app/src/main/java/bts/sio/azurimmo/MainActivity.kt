@@ -8,20 +8,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import bts.sio.azurimmo.ui.theme.Azurimmo2Theme
-import bts.sio.azurimmo.views.appartement.AppartementList
-import bts.sio.azurimmo.views.batiment.BatimentList
-import bts.sio.azurimmo.views.contrat.ContratList
-import bts.sio.azurimmo.views.intervention.InterventionList
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MainScreen()
-            //AppartementList()
-            //BatimentList()
-            //ContratList()
-            //InterventionList()
+            Azurimmo2Theme {
+                MainScreen()
+            }
         }
     }
 }

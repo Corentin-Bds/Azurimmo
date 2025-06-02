@@ -1,4 +1,5 @@
-package bts.sio.azurimmo.views.batiment
+// LocataireList.kt
+package bts.sio.azurimmo.views.locataire
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,26 +15,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import bts.sio.azurimmo.viewsmodel.batiment.BatimentViewModel
+import bts.sio.azurimmo.viewsmodel.locataire.LocataireViewModel
 
 @Composable
-fun BatimentList(
-    viewModel: BatimentViewModel = viewModel(),
-    onBatimentClick: (Int) -> Unit,
-    onAddBatimentClick: () -> Unit,
+fun LocataireList(
+    viewModel: LocataireViewModel = viewModel(),
+    onAddClick: () -> Unit,
     onBackClick: () -> Unit
 ) {
-    val batiments = viewModel.batiments.value
+    val locataires = viewModel.locataires.value
     val isLoading = viewModel.isLoading.value
     val errorMessage = viewModel.errorMessage.value
 
     LaunchedEffect(Unit) {
-        viewModel.getBatiments()
+        viewModel.getLocataires()
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column {
-            // Header avec bouton retour, titre et bouton ajouter
+            // Header avec bouton retour
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -46,11 +46,11 @@ fun BatimentList(
                 }
 
                 Text(
-                    text = "Bâtiments",
+                    text = "Locataires",
                     style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
                 )
 
-                IconButton(onClick = onAddBatimentClick) {
+                IconButton(onClick = onAddClick) {
                     Icon(Icons.Default.Add, contentDescription = "Ajouter")
                 }
             }
@@ -78,28 +78,16 @@ fun BatimentList(
                     }
                 }
 
-                batiments.isEmpty() -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "Aucun bâtiment trouvé",
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(16.dp)
-                        )
-                    }
-                }
-
                 else -> {
                     LazyColumn(
                         modifier = Modifier.padding(horizontal = 16.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(batiments) { batiment ->
-                            BatimentCard(
-                                batiment = batiment,
-                                onClick = { onBatimentClick(batiment.id) }
+                        items(locataires) { locataire ->
+                            LocataireCard(
+                                locataire = locataire,
+                                onEditClick = { /* TODO: Édition */ },
+                                onDeleteClick = { viewModel.deleteLocataire(locataire.id) }
                             )
                         }
                     }

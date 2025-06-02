@@ -1,10 +1,9 @@
-package bts.sio.azurimmo.views.batiment
+package bts.sio.azurimmo.views.appartement
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -14,45 +13,41 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import bts.sio.azurimmo.viewsmodel.batiment.BatimentViewModel
+import bts.sio.azurimmo.viewsmodel.appartement.AppartementViewModel
 
 @Composable
-fun BatimentList(
-    viewModel: BatimentViewModel = viewModel(),
-    onBatimentClick: (Int) -> Unit,
-    onAddBatimentClick: () -> Unit,
+fun AppartementListGlobal(
+    viewModel: AppartementViewModel = viewModel(),
     onBackClick: () -> Unit
 ) {
-    val batiments = viewModel.batiments.value
+    val appartements = viewModel.appartements.value
     val isLoading = viewModel.isLoading.value
     val errorMessage = viewModel.errorMessage.value
 
     LaunchedEffect(Unit) {
-        viewModel.getBatiments()
+        viewModel.getAppartements()
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column {
-            // Header avec bouton retour, titre et bouton ajouter
+            // Header
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onBackClick) {
                     Icon(Icons.Default.ArrowBack, contentDescription = "Retour")
                 }
 
+                Spacer(modifier = Modifier.width(8.dp))
+
                 Text(
-                    text = "Bâtiments",
+                    text = "Tous les appartements",
                     style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
                 )
-
-                IconButton(onClick = onAddBatimentClick) {
-                    Icon(Icons.Default.Add, contentDescription = "Ajouter")
-                }
             }
 
             when {
@@ -78,13 +73,13 @@ fun BatimentList(
                     }
                 }
 
-                batiments.isEmpty() -> {
+                appartements.isEmpty() -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "Aucun bâtiment trouvé",
+                            text = "Aucun appartement trouvé",
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier.padding(16.dp)
                         )
@@ -96,11 +91,8 @@ fun BatimentList(
                         modifier = Modifier.padding(horizontal = 16.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(batiments) { batiment ->
-                            BatimentCard(
-                                batiment = batiment,
-                                onClick = { onBatimentClick(batiment.id) }
-                            )
+                        items(appartements) { appartement ->
+                            AppartementCardGlobal(appartement = appartement)
                         }
                     }
                 }

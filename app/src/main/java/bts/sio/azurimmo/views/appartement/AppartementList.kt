@@ -1,145 +1,174 @@
 package bts.sio.azurimmo.views.appartement
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.PointerIcon.Companion.Text
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.LineHeightStyle
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import bts.sio.azurimmo.views.batiment.BatimentCard
 import bts.sio.azurimmo.viewsmodel.appartement.AppartementViewModel
 import bts.sio.azurimmo.viewsmodel.batiment.BatimentViewModel
 
-// Fonction Composable pour afficher la liste des bâtiments
 @Composable
 fun AppartementList(
-    viewModel: AppartementViewModel = viewModel(),
+    viewModelAppart: AppartementViewModel = viewModel(),
+    viewModelBat: BatimentViewModel = viewModel(),
     batimentId: Int,
-    onAddAppartementClick: () -> Unit
+    onAddAppartementClick: () -> Unit,
+    onBackClick: () -> Unit
 ) {
-    val viewModelBat: BatimentViewModel = viewModel()
-    val appartements = viewModel.appartements.value
+    val appartements = viewModelAppart.appartements.value
     val batiment = viewModelBat.batiment.value
-    val isLoading = viewModel.isLoading.value
-    val errorMessage = viewModel.errorMessage.value
+    val isLoadingAppart = viewModelAppart.isLoading.value
+    val isLoadingBat = viewModelBat.isLoading.value
+    val isLoading = isLoadingAppart || isLoadingBat
+    val errorMessageAppart = viewModelAppart.errorMessage.value
+    val errorMessageBat = viewModelBat.errorMessage.value
+    val errorMessage = errorMessageAppart ?: errorMessageBat
+
     LaunchedEffect(batimentId) {
-        viewModel.getAppartementsByBatimentId(batimentId)
+        viewModelAppart.getAppartementsByBatimentId(batimentId)
         viewModelBat.getBatiment(batimentId)
     }
-    Box(modifier = Modifier.fillMaxSize()) {
-        when {
-            isLoading -> {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            }
-            errorMessage != null -> {
-                Text(
-                    text = errorMessage ?: "Erreur inconnue",
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .padding(16.dp),
-                    color = MaterialTheme.colorScheme.error
-                )
-            }
-            else -> {
-                FloatingActionButton(
-                    onClick = {
-                        println("Bouton + cliqué") // Vérification Logcat
-                        onAddAppartementClick()
-                    },
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd) // Assure qu'il est bien visible
-                        .padding(16.dp)
-                        .background(MaterialTheme.colorScheme.secondary),
-                    content = {
-                        Icon(Icons.Default.Add, contentDescription = "Ajouter un appartement")
-                    }
-                )
-                LazyColumn {
-                    if (batiment!=null) {
-                        item {
 
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
-                                    .padding(16.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally // Centrer le contenu horizontalement
-                            ) {
-                                Text(
-                                    text = "Informations sur le bâtiment",
-                                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(
-                                    text = "Adresse : ${batiment.adresse}",
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                                Text(
-                                    text = "Ville : ${batiment.ville}",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column {
+            // Header avec bouton retour, titre et bouton ajouter
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = onBackClick) {
+                    Icon(Icons.Default.ArrowBack, contentDescription = "Retour")
+                }
+
+                Text(
+                    text = "Appartements",
+                    style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
+                )
+
+                IconButton(onClick = onAddAppartementClick) {
+                    Icon(Icons.Default.Add, contentDescription = "Ajouter")
+                }
+            }
+
+            when {
+                isLoading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+
+                errorMessage != null -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = errorMessage,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+                }
+
+                else -> {
+                    LazyColumn(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        // Informations du bâtiment
+                        if (batiment != null) {
+                            item {
+                                Card(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = MaterialTheme.colorScheme.primaryContainer
+                                    )
+                                ) {
+                                    Column(
+                                        modifier = Modifier.padding(16.dp)
+                                    ) {
+                                        Text(
+                                            text = "Informations du bâtiment",
+                                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                                        )
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        Text(
+                                            text = "Adresse : ${batiment.adresse}",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                                        )
+                                        Text(
+                                            text = "Ville : ${batiment.ville}",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                                        )
+                                    }
+                                }
                             }
                         }
+
+                        // Titre de la liste des appartements
+                        item {
+                            Text(
+                                text = if (appartements.isNotEmpty())
+                                    "Liste des appartements (${appartements.size})"
+                                else
+                                    "Aucun appartement",
+                                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                                modifier = Modifier.padding(vertical = 8.dp)
+                            )
+                        }
+
+                        // Liste des appartements ou message vide
                         if (appartements.isNotEmpty()) {
-                            /* BLOC AVEC LISTE DES APPARTEMENTS *********************/
-// Ajouter un titre pour la liste des appartements
-                            item {
-                                Text(
-                                    text = "Liste des appartements",
-                                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 1.dp)
-                                        .padding(16.dp),
-                                    textAlign = TextAlign.Center, // Alignement à gauche
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                            }
-// Liste des appartements
                             items(appartements) { appartement ->
                                 AppartementCard(appartement = appartement)
                             }
-                        }
-                        else
-                        {
-// Il n'y a pas d'appartement pour ce batiment
+                        } else {
                             item {
-                                Text(
-                                    text = "Pas d'appartement pour ce batiment",
-                                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 1.dp)
-                                        .padding(16.dp),
-                                    textAlign = TextAlign.Center, // Alignement à gauche
-                                    color = MaterialTheme.colorScheme.primary
-                                )
+                                Card(
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(32.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Column(
+                                            horizontalAlignment = Alignment.CenterHorizontally
+                                        ) {
+                                            Text(
+                                                text = "Aucun appartement dans ce bâtiment",
+                                                style = MaterialTheme.typography.bodyLarge,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                            Spacer(modifier = Modifier.height(8.dp))
+                                            Text(
+                                                text = "Cliquez sur + pour ajouter le premier appartement",
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
